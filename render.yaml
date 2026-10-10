@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: phoenix-platform
+    runtime: node
+    plan: free
+    buildCommand: echo "no build step"
+    startCommand: node server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: THERAPIST_CODE
+        generateValue: true
+      - key: ADMIN_CODE
+        generateValue: true

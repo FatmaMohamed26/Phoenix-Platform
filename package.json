@@ -1,0 +1,19 @@
+{
+  "name": "phoenix-mental-health-platform",
+  "version": "1.0.0",
+  "description": "منصة الدعم النفسي وحل الضغوطات لطلبة الجامعات",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "mental-health",
+    "students",
+    "psychology",
+    "rorschach",
+    "breathing",
+    "journal"
+  ],
+  "author": "Phoenix Support Team",
+  "license": "ISC"
+}

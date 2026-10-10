@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem("phoenix_theme")||"light"}catch(e){}</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منصة فينيكس | الدعم النفسي وحل الضغوطات لطلبة الجامعات</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/polish.css">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <meta name="theme-color" content="#144955">
+</head>
+<body>
+  <div id="splash"><img src="assets/logo.png" alt=""><strong>مَنَصَّة فِينِيكْس</strong><div class="splash-bar"></div></div>
+  <button id="themeToggle" class="theme-toggle" onclick="toggleTheme()" title="الوضع الليلي / النهاري"><i class="fa-solid fa-moon"></i></button>
+  <div id="toastBox"></div>
+
+  <!-- ================= AUTH SCREEN (LOGIN & REGISTER) ================= -->
+  <div id="authScreen" class="auth-screen">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="auth-logo-wrapper">
+          <img src="assets/logo.png" alt="شعار فينيكس للدعم النفسي" class="auth-logo">
+        </div>
+        <h1 class="brand-title">مَنَصَّة فِينِيكْس</h1>
+        <p class="brand-tagline">ملاذ الدعم النفسي وحل الضغوطات لطلبة الجامعات</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button id="tabLogin" class="tab-btn active" onclick="switchAuthTab('login')">
+          <i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول
+        </button>
+        <button id="tabRegister" class="tab-btn" onclick="switchAuthTab('register')">
+          <i class="fa-solid fa-user-plus"></i> إنشاء حساب جديد
+        </button>
+      </div>
+
+      <!-- Auth Form -->
+      <form id="authForm" onsubmit="handleAuthSubmit(event)">
+        <!-- Name field (shown only on register) -->
+        <div id="nameGroup" class="form-group" style="display: none;">
+          <label for="userNameInput"><i class="fa-solid fa-signature"></i> الاسم الكامل</label>
+          <input type="text" id="userNameInput" placeholder="أدخل اسمك الكريم (مثلاً: سارة محمد أو أحمد علي)">
+        </div>
+
+        <div id="roleGroup" class="form-group" style="display: none;">
+          <label for="regRole"><i class="fa-solid fa-user-tag"></i> نوع الحساب (دورك في المنصة)</label>
+          <select id="regRole" onchange="onRegRoleChange()">
+            <option value="user">طالب جامعي</option>
+            <option value="therapist">معالج / أخصائي نفسي</option>
+            <option value="admin">مدير المنصة (أدمن)</option>
+          </select>
+        </div>
+        <div id="codeGroup" class="form-group" style="display: none;">
+          <label for="regCode"><i class="fa-solid fa-shield-halved"></i> رمز التفعيل (يعطيه لك مسؤول المنصة)</label>
+          <input type="text" id="regCode" placeholder="مثال: PHX-THERAPIST-2026" autocomplete="off">
+        </div>
+
+
+        <!-- Email field -->
+        <div class="form-group">
+          <label for="userEmailInput"><i class="fa-solid fa-envelope"></i> البريد الإلكتروني</label>
+          <input type="email" id="userEmailInput" placeholder="name@university.edu" required>
+        </div>
+
+        <!-- Password field -->
+        <div class="form-group">
+          <label for="userPasswordInput"><i class="fa-solid fa-lock"></i> كلمة المرور</label>
+          <div class="password-wrapper">
+            <input type="password" id="userPasswordInput" placeholder="••••••••" required>
+            <button type="button" class="toggle-pwd-btn" onclick="togglePasswordVisibility()">
+              <i id="pwdToggleIcon" class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+
+        <div id="forgotLinkRow" class="forgot-link-row">
+          <a href="#" onclick="openForgotModal(event)"><i class="fa-solid fa-key"></i> نسيت كلمة المرور؟</a>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="authSubmitBtn" class="btn btn-primary btn-block">
+          <span id="authBtnText">تسجيل الدخول</span>
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+
+        <div id="authAlert" class="alert-box" style="display: none;"></div>
+      </form>
+
+      <!-- Quick Demo Access Bar -->
+      <div class="demo-access-box">
+        <span class="demo-title"><i class="fa-solid fa-bolt"></i> دخول سريع بحسابات تجريبية مسبقة:</span>
+        <div class="demo-btns">
+          <button type="button" class="btn-demo" onclick="fillDemo('student@phoenix.edu', 'student123', 'user')">
+            <i class="fa-solid fa-graduation-cap"></i> حساب طالب
+          </button>
+          <button type="button" class="btn-demo" onclick="fillDemo('therapist@phoenix.edu', 'doc123', 'therapist')">
+            <i class="fa-solid fa-user-doctor"></i> حساب معالج
+          </button>
+          <button type="button" class="btn-demo" onclick="fillDemo('admin@phoenix.edu', 'admin123', 'admin')">
+            <i class="fa-solid fa-shield-halved"></i> حساب أدمن
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= MAIN APP SHELL ================= -->
+  <div id="appShell" class="app-shell" style="display: none;">
+
+    <!-- TOP HEADER -->
+    <header class="app-header">
+      <div class="header-right">
+        <button id="sidebarToggle" class="sidebar-toggle-btn" onclick="toggleSidebar()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="header-brand">
+          <img src="assets/logo.png" alt="فينيكس" class="header-logo">
+          <div class="brand-text">
+            <h2 class="title">مَنَصَّة فِينِيكْس</h2>
+            <span class="subtitle">الدعم النفسي الجامعي وحل الضغوطات</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-left">
+        <div class="user-badge-chip">
+          <div class="user-avatar-circle" id="userAvatarChar">ط</div>
+          <div class="user-details">
+            <strong id="headerUserName">اسم الطالب</strong>
+            <span id="headerUserRoleBadge" class="badge-role role-user">طالب / مستخدم</span>
+          </div>
+        </div>
+
+        <button class="btn btn-outline btn-logout" onclick="logout()" title="تسجيل الخروج">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>خروج</span>
+        </button>
+      </div>
+    </header>
+
+
+    <!-- APP BODY (SIDEBAR + MAIN CONTENT) -->
+    <div class="app-body">
+
+      <!-- SIDEBAR -->
+      <aside id="appSidebar" class="app-sidebar">
+        <div class="sidebar-header-info">
+          <span class="nav-section-title">القوائم والخدمات</span>
+        </div>
+
+        <nav class="sidebar-nav">
+          <!-- User / Student Navigation Items -->
+          <div id="navGroupUser" class="nav-group">
+            <button class="nav-item active" onclick="navigateTo('viewOverview')">
+              <i class="fa-solid fa-house"></i>
+              <span>الرئيسية ونظرة عامة</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('viewVenting')">
+              <i class="fa-solid fa-comments"></i>
+              <span>ركن الفضفضة والحلول</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('viewGoals')">
+              <i class="fa-solid fa-bullseye"></i>
+              <span>مذكرة الأفكار والأهداف</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('viewBreathing')">
+              <i class="fa-solid fa-wind"></i>
+              <span>تمرين التنفس المهدئ</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('viewEmergency')">
+              <i class="fa-solid fa-life-ring"></i>
+              <span>مساعدة عاجلة</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('viewRorschach')">
+              <i class="fa-solid fa-eye"></i>
+              <span>اختبار بقع الحبر (رورشاخ)</span>
+            </button>
+          </div>
+
+          <!-- Therapist Navigation Items -->
+          <div id="navGroupTherapist" class="nav-group" style="display: none;">
+            <button class="nav-item" onclick="navigateTo('viewTherapistHome')"><i class="fa-solid fa-house"></i><span>الرئيسية</span></button>
+          <button class="nav-item" onclick="navigateTo('viewTherapistHub')">
+              <i class="fa-solid fa-hand-holding-heart"></i>
+              <span>صندوق استشارات الطلاب</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('viewTherapistTests')">
+              <i class="fa-solid fa-clipboard-check"></i>
+              <span>نتائج اختبارات الطلاب</span>
+            </button>
+          </div>
+
+          <!-- Admin Navigation Items -->
+          <div id="navGroupAdmin" class="nav-group" style="display: none;">
+            <button class="nav-item" onclick="navigateTo('viewAdminHome')"><i class="fa-solid fa-house"></i><span>الرئيسية</span></button>
+          <button class="nav-item" onclick="navigateTo('viewAdminDb')">
+              <i class="fa-solid fa-database"></i>
+              <span>قاعدة بيانات المستخدمين</span>
+            </button>
+            <button class="nav-item" onclick="navigateTo('viewAdminStats')">
+              <i class="fa-solid fa-chart-pie"></i>
+              <span>إحصائيات المنصة</span>
+            </button>
+          </div>
+        </nav>
+
+        <div class="sidebar-phoenix-quote">
+          <img src="assets/logo.png" alt="طائر الفينيق" class="quote-logo">
+          <p>«كالطائر المحلق من قلب التحدي، كل ضغط نفسي هو بداية لنهوض أقوى وأكثر نضجاً.»</p>
+        </div>
+      </aside>
+
+
+      <!-- MAIN CONTENT VIEWS -->
+      <main class="app-main">
+
+        <!-- ================= VIEW 1: OVERVIEW (STUDENT DASHBOARD) ================= -->
+        <section id="viewOverview" class="content-view active">
+          <!-- Hero Banner -->
+          <div class="welcome-hero">
+            <div class="hero-text">
+              <div class="greeting-badge"><i class="fa-regular fa-sun"></i> مرحباً بك في مساحتك الآمنة</div>
+              <h2 id="heroWelcomeName" class="hero-greet">أهلاً بك يا بطل!</h2>
+              <p>نحن هنا لمساندتك في رحلتك الجامعية. لا تدع التوتر والضغوط الأكاديمية تثقل كاهلك، استعن بأدواتنا المصممة خصيصاً لك.</p>
+              
+              <div class="hero-actions">
+                <button class="btn btn-primary" onclick="navigateTo('viewVenting')">
+                  <i class="fa-solid fa-heart-pulse"></i> فضفض واحصل على حلول
+                </button>
+                <button class="btn btn-outline" onclick="navigateTo('viewBreathing')">
+                  <i class="fa-solid fa-wind"></i> ابدأ تمرين التنفس (دقيقة راحة)
+                </button>
+              </div>
+            </div>
+            <div class="hero-image-box">
+              <img src="assets/logo.png" alt="شعار فينيكس" class="hero-logo-img">
+            </div>
+          </div>
+
+          <!-- Quick Daily Mood Tracker -->
+          <div class="card mood-checkin-card">
+            <h3><i class="fa-solid fa-face-smile"></i> كيف تشعر اليوم في حياتك الجامعية؟</h3>
+            <p class="subtitle-text">اختر شعورك لتلقي نصيحة موجهة فورية تساعدك على تجاوز يومك:</p>
+            <div class="mood-options">
+              <button class="mood-btn" onclick="selectMoodCheckin('مرتاح ومتفائل', 'رائع جداً! استغل هذا التدفق الإيجابي لإنجاز أهدافك الصعبة ومساعدة زملائك.', '😊')">
+                <span class="emoji">😊</span>
+                <span>مرتاح</span>
+              </button>
+              <button class="mood-btn" onclick="selectMoodCheckin('متوتر وقلق من الامتحانات', 'التوتر إشارة إلى اهتمامك، لكن لا تدعه يشلك. قسّم موادك لمهام صغيرة وطبق تمرين التنفس الآن.', '😰')">
+                <span class="emoji">😰</span>
+                <span>متوتر</span>
+              </button>
+              <button class="mood-btn" onclick="selectMoodCheckin('مشتت وفاقد للشغف', 'فقدان الشغف المؤقت طبيعي نتيجة الإرهاق. خذ استراحة ساعتين كاملة بعيداً عن الشاشات والواجبات.', '😵')">
+                <span class="emoji">😵</span>
+                <span>مشتت</span>
+              </button>
+              <button class="mood-btn" onclick="selectMoodCheckin('مُرهق ومضغوط بالوقت', 'نظم أولوياتك اليومية على 3 أمور أساسية فقط، واترك الباقي لغد. صحتك النفسية هي الأساس الأول لنجاحك.', '😫')">
+                <span class="emoji">😫</span>
+                <span>مُرهق</span>
+              </button>
+            </div>
+            <div id="moodFeedback" class="mood-feedback-box" style="display: none;"></div>
+          </div>
+
+          <!-- Features Grid -->
+          <div class="features-grid">
+            <div class="feature-card" onclick="navigateTo('viewVenting')">
+              <div class="feature-icon icon-venting"><i class="fa-solid fa-comments"></i></div>
+              <h4>ركن الفضفضة والحلول المتخصصة</h4>
+              <p>تحدث بحرية عما يقلقك، واحصل فوراً على اقتراحات علاجية متخصصة وموجهة لطلاب الجامعات مع إمكانية مراجعتها من معالج نفسي.</p>
+              <span class="feature-link">ادخل للفضفضة <i class="fa-solid fa-arrow-left"></i></span>
+            </div>
+
+            <div class="feature-card" onclick="navigateTo('viewGoals')">
+              <div class="feature-icon icon-goals"><i class="fa-solid fa-bullseye"></i></div>
+              <h4>مذكرة الأفكار والأهداف</h4>
+              <p>نظّم أهدافك قصيرة المدى (المهام الأسبوعية) والأهداف طويلة المدى (المسار والتخرج)، ودون أفكارك لتفريغ الذهن.</p>
+              <span class="feature-link">استعرض الأهداف <i class="fa-solid fa-arrow-left"></i></span>
+            </div>
+
+            <div class="feature-card" onclick="navigateTo('viewBreathing')">
+              <div class="feature-icon icon-breath"><i class="fa-solid fa-wind"></i></div>
+              <h4>تمرين التنفس التفاعلي</h4>
+              <p>جلسة تنفس عميقة بنظام 4-7-8 لخفض هرمونات التوتر وتهدئة ضربات القلب قبل المحاضرات أو الامتحانات.</p>
+              <span class="feature-link">ابدأ التمرين <i class="fa-solid fa-arrow-left"></i></span>
+            </div>
+
+            <div class="feature-card" onclick="navigateTo('viewRorschach')">
+              <div class="feature-icon icon-test"><i class="fa-solid fa-eye"></i></div>
+              <h4>اختبار بقع الحبر (Rorschach)</h4>
+              <p>تجربة نفسية استكشافية تفاعلية تعتمد على بطاقات بقع الحبر لاكتشاف جوانب التفكير والعواطف الكامنة لديك.</p>
+              <span class="feature-link">خوض الاختبار <i class="fa-solid fa-arrow-left"></i></span>
+            </div>
+          </div>
+        
+        <div class="card progress-card" id="progressCard" style="margin-top:1.5rem;">
+          <div class="progress-head">
+            <div><h3><i class="fa-solid fa-chart-line"></i> مزاجك خلال آخر 14 يوماً</h3><p class="muted">سجّل شعورك يومياً لترى تطورك.</p></div>
+            <div class="streak-pill" id="streakPill">🔥 <strong id="streakCount">0</strong> يوم متتالي</div>
+          </div>
+          <div class="mood-chart" id="moodChart"></div>
+          <h4 style="margin:1.2rem 0 .6rem;color:var(--primary-teal)"><i class="fa-solid fa-medal"></i> إنجازاتك</h4>
+          <div class="badges-grid" id="badgesGrid"></div>
+        </div>
+        </section>
+
+        <section id="viewEmergency" class="content-view">
+          <div class="view-header"><h2><i class="fa-solid fa-life-ring"></i> مساعدة عاجلة</h2>
+            <p>إذا كنت تشعر بخطر أو بضيق شديد، لا تبقَ وحدك. تواصل الآن مع أحد هذه الخيارات.</p></div>
+          <div class="emergency-grid">
+            <a class="emergency-card em-red" href="tel:123"><span class="em-ico">🚑</span><strong>الإسعاف</strong><span class="em-num">123</span><small>حالات الطوارئ الطبية</small></a>
+            <a class="emergency-card em-teal" href="tel:08008880700"><span class="em-ico">📞</span><strong>الخط الساخن للصحة النفسية</strong><span class="em-num">08008880700</span><small>مجاني - الأمانة العامة للصحة النفسية (وزارة الصحة)</small></a>
+            <a class="emergency-card em-gold" href="tel:16328"><span class="em-ico">💬</span><strong>الخط الساخن (رقم مختصر)</strong><span class="em-num">16328</span><small>استشارات الصحة النفسية وعلاج الإدمان</small></a>
+          </div>
+          <div class="card" style="margin-top:1.2rem;">
+            <h3><i class="fa-solid fa-hand-holding-heart"></i> تمرين تهدئة سريع (5-4-3-2-1)</h3>
+            <p class="muted" style="line-height:1.9">سمِّ بصوت منخفض: <strong>5</strong> أشياء تراها، <strong>4</strong> أشياء تلمسها، <strong>3</strong> أصوات تسمعها، <strong>2</strong> رائحتان تشمهما، و<strong>1</strong> شيء تتذوقه. ثم خذ نفساً عميقاً ببطء.</p>
+            <p class="muted">كلّم شخصاً تثق به الآن، أو اكتب لمعالج المنصة في <a href="#" onclick="navigateTo('viewVenting');return false;">ركن الفضفضة</a>.</p>
+          </div>
+        </section>
+
+
+
+        <!-- ================= VIEW 2: VENTING & SPECIALIZED SOLUTIONS ================= -->
+        <section id="viewVenting" class="content-view">
+          <div class="view-header">
+            <div>
+              <h2><i class="fa-solid fa-comments text-amber"></i> ركن الفضفضة والحلول المتخصصة</h2>
+              <p>مساحتك الخاصة والآمنة لتفريغ ما بقلبك، والحصول على إرشادات وحلول نفسية مدروسة خصيصاً للتحديات الجامعية.</p>
+            </div>
+          </div>
+
+          <div class="venting-layout">
+            <!-- Venting Input Form -->
+            <div class="card venting-form-card">
+              <h3><i class="fa-solid fa-pen-fancy"></i> شاركنا ما يثقل تفكيرك الآن</h3>
+              <form id="ventingForm" onsubmit="handleVentingSubmit(event)">
+                <div class="form-group">
+                  <label><i class="fa-solid fa-user-doctor"></i> اختر المعالج الذي سيصله طلبك:</label>
+                  <select id="ventingTherapist"></select>
+                </div>
+                <div class="form-group">
+                  <label><i class="fa-solid fa-layer-group"></i> تصنيف المشكلة / مصدر الضغط:</label>
+                  <select id="ventingCategory" required>
+                    <option value="قلق الامتحانات وضغط المواد">قلق الامتحانات وضغط المواد الدراسية</option>
+                    <option value="التسويف وصعوبة إدارة الوقت">التسويف وصعوبة تنظيم وقت المذاكرة</option>
+                    <option value="الإرهاق النفسي والاحتراق الأكاديمي">الإرهاق النفسي والاحتراق الأكاديمي (Burnout)</option>
+                    <option value="التشتت والخوف من المستقبل المهني">التشتت والخوف من المستقبل والتخرج</option>
+                    <option value="العلاقات والضغوط الاجتماعية بالجامعة">العلاقات والضغوط الاجتماعية والعائلية</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label><i class="fa-solid fa-heart-pulse"></i> حالتك النفسية الحالية:</label>
+                  <select id="ventingMood">
+                    <option value="مُرهق جداً وغير قادر على التركيز">مُرهق جداً وغير قادر على التركيز</option>
+                    <option value="قلق ومتوتر وخائف من الفشل">قلق ومتوتر وخائف من الفشل</option>
+                    <option value="حائر ومشتت بين مسؤوليات كثيرة">حائر ومشتت بين مسؤوليات كثيرة</option>
+                    <option value="حزين وفاقد للدافع تماماً">حزين وفاقد للدافع تماماً</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label><i class="fa-solid fa-feather-pointed"></i> رسالتك وفضفضتك (اكتب بكل حرية وبدون قيود):</label>
+                  <textarea id="ventingText" rows="5" placeholder="اكتب كل ما يدور في رأسك وما تشعر به في هذه اللحظة... هنا لا يوجد أحكام، فقط استماع وتوجيه." required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                  <i class="fa-solid fa-paper-plane"></i> إرسال الفضفضة وتلقي الحلول المتخصصة
+                </button>
+              </form>
+            </div>
+
+            <!-- Venting Feed / History -->
+            <div class="venting-feed-container">
+              <h3><i class="fa-solid fa-clock-rotate-left"></i> سجل الفضفضة والحلول المقدمة</h3>
+              <div id="ventingFeedList" class="venting-feed-list">
+                <!-- Rendered dynamically via JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================= VIEW 3: GOALS & THOUGHTS JOURNAL ================= -->
+        <section id="viewGoals" class="content-view">
+          <div class="view-header">
+            <div>
+              <h2><i class="fa-solid fa-bullseye text-amber"></i> مذكرة الأفكار والأهداف الجامعية</h2>
+              <p>تحويل الضغوط والتشتت إلى خطوات عملية واضحة على المدى القصير والطويل.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openNewGoalModal()">
+              <i class="fa-solid fa-plus"></i> إضافة هدف أو فكرة جديدة
+            </button>
+          </div>
+
+          <!-- Goal Filters & Tabs -->
+          <div class="goals-tabs">
+            <button class="tab-btn active" onclick="filterGoals('all')">جميع الأهداف</button>
+            <button class="tab-btn" onclick="filterGoals('short')">🎯 أهداف قصيرة المدى (أسبوعية/دراسية)</button>
+            <button class="tab-btn" onclick="filterGoals('long')">🚀 أهداف طويلة المدى (تخرج/مسار مهني)</button>
+          </div>
+
+          <!-- Goals List Container -->
+          <div id="goalsContainer" class="goals-grid">
+            <!-- Dynamic Goals injected by JS -->
+          </div>
+        </section>
+
+
+        <!-- ================= VIEW 4: BREATHING EXERCISE ================= -->
+        <section id="viewBreathing" class="content-view">
+          <div class="view-header text-center">
+            <h2><i class="fa-solid fa-wind text-amber"></i> تمرين التنفس التفاعلي (4-7-8)</h2>
+            <p>تمرين مثبت علمياً لتهدئة الجهاز العصبي السمبثاوي وتخفيض نبضات القلب عند الشعور بالهلع أو التوتر الجامعي.</p>
+          </div>
+
+          <div class="breathing-stage-card">
+            <!-- Animated Visual Breathing Circle -->
+            <div class="breathing-circle-wrapper">
+              <div id="breathingCircle" class="breathing-circle">
+                <div class="breathing-inner-glow"></div>
+                <div class="breathing-content">
+                  <span id="breathPhaseText" class="phase-title">استعد</span>
+                  <span id="breathCounter" class="phase-count">0</span>
+                  <span id="breathInstruction" class="phase-sub">اضغط زر البدء لتصفية ذهنك</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="breathing-controls">
+              <button id="btnStartBreath" class="btn btn-primary btn-lg" onclick="toggleBreathingExercise()">
+                <i class="fa-solid fa-play"></i> ابدأ التمرين الآن
+              </button>
+              <button class="btn btn-outline" onclick="resetBreathingExercise()">
+                <i class="fa-solid fa-rotate-right"></i> إعادة الضبط
+              </button>
+            </div>
+
+            <!-- Guide explanation -->
+            <div class="breathing-guide-steps">
+              <div class="step-box">
+                <span class="step-num">4 ثوانٍ</span>
+                <strong>شَهِيق عَمِيق</strong>
+                <p>استنشق الهواء بهدوء من الأنف واملأ رئتيك.</p>
+              </div>
+              <div class="step-box">
+                <span class="step-num">7 ثوانٍ</span>
+                <strong>حَبْس النَفَس</strong>
+                <p>احتفظ بالهواء بلطف لتهدئة معدل ضربات القلب.</p>
+              </div>
+              <div class="step-box">
+                <span class="step-num">8 ثوانٍ</span>
+                <strong>زَفِير بَطِيء</strong>
+                <p>أخرج الهواء كاملاً ببطء من الفم مع تفريغ كل التوتر.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================= VIEW 5: RORSCHACH INKBLOT TEST ================= -->
+        <section id="viewRorschach" class="content-view">
+          <div class="view-header">
+            <div>
+              <h2><i class="fa-solid fa-eye text-amber"></i> اختبار بقع الحبر لرورشاخ (Rorschach Inkblot Test)</h2>
+              <p>اختبار إسقاطي كلاسيكي تفاعلي؛ انظر إلى بقع الحبر واكتب ما تراه بصدق لاكتشاف مشاعرك وأسلوب تفكيرك الداخلي.</p>
+            </div>
+          </div>
+
+          <div class="rorschach-container card">
+            <div class="rorschach-progress-bar">
+              <span id="rorschachStepIndicator">البطاقة 1 من 4</span>
+              <div class="progress-track"><div id="rorschachProgressFill" class="progress-fill" style="width: 25%;"></div></div>
+            </div>
+
+            <!-- Card Display Area -->
+            <div class="inkblot-stage">
+              <div class="inkblot-card-frame">
+                <div id="inkblotGraphic" class="inkblot-graphic">
+                  <!-- Vector Inkblots rendered dynamically -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive Questions -->
+            <div class="rorschach-interaction">
+              <h3 id="rorschachPrompt">ما هو أول شيء يتبادر إلى ذهنك عند النظر إلى هذه البقعة؟</h3>
+              
+              <div class="rorschach-options" id="rorschachOptionsContainer">
+                <!-- Preset common visual impressions -->
+              </div>
+
+              <div class="form-group custom-perception-group">
+                <label for="customPerceptionInput">أو اكتب وصفك الخاص بحرية:</label>
+                <input type="text" id="customPerceptionInput" placeholder="أرى في هذه البقعة...">
+              </div>
+
+              <div class="rorschach-nav-btns">
+                <button id="btnPrevInkblot" class="btn btn-outline" onclick="prevInkblotCard()" style="display: none;">
+                  <i class="fa-solid fa-arrow-right"></i> البطاقة السابقة
+                </button>
+                <button id="btnNextInkblot" class="btn btn-primary" onclick="nextInkblotCard()">
+                  <span>التالي</span>
+                  <i class="fa-solid fa-arrow-left"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Test Result Modal / Analysis Box -->
+            <div id="rorschachResultBox" class="rorschach-result-box" style="display: none;">
+              <div class="result-header">
+                <div class="result-badge"><i class="fa-solid fa-brain"></i> التحليل الإرشادي النفسي المبدئي</div>
+                <h3 id="resultTraitTitle">نمط التفكير والتعامل مع المشاعر</h3>
+              </div>
+              <p id="resultTraitDetails" class="result-text"></p>
+              <div class="result-tips-box" id="resultTipsList"></div>
+              <button class="btn btn-primary" onclick="restartRorschach()">إعادة خوض الاختبار</button>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================= VIEW 6: THERAPIST DASHBOARD ================= -->
+        <section id="viewTherapistHome" class="content-view">
+          <div class="welcome-hero">
+            <div class="hero-text">
+              <div class="greeting-badge"><i class="fa-regular fa-sun"></i> مرحباً بك في مساحتك المهنية</div>
+              <h2 class="hero-greet">أهلاً بك!</h2>
+              <p>هنا تتابع حالات طلابك أنت فقط، وتكتب لهم توجيهاً نفسياً متخصصاً يصلهم مباشرة في حساباتهم.</p>
+              <div class="hero-actions"><button class="btn btn-primary" onclick="navigateTo('viewTherapistHub')"><i class="fa-solid fa-inbox"></i> صندوق استشارات الطلاب</button><button class="btn btn-outline" onclick="navigateTo('viewTherapistTests')"><i class="fa-solid fa-clipboard-check"></i> نتائج اختبارات طلابي</button></div>
+            </div>
+            <div class="hero-image-box"><img src="assets/logo.png" alt="شعار فينيكس" class="hero-logo-img"></div>
+          </div>
+          <div class="home-stats">
+            <div class="card home-stat"><span class="hs-num" id="thCases">0</span><small>إجمالي حالات طلابي</small></div>
+            <div class="card home-stat"><span class="hs-num" id="thPending">0</span><small>بانتظار ردك</small></div>
+            <div class="card home-stat"><span class="hs-num" id="thReplied">0</span><small>ردود أرسلتها</small></div>
+            <div class="card home-stat"><span class="hs-num" id="thTests">0</span><small>نتائج اختبارات طلابي</small></div>
+          </div>
+        </section>
+        <section id="viewTherapistHub" class="content-view">
+          <div class="view-header">
+            <div>
+              <h2><i class="fa-solid fa-user-doctor text-amber"></i> لوحة تحكم المعالج النفسي</h2>
+              <p>مراجعة حالات الطلاب، متابعة الضغوط النفسية المسجلة، وتقديم حلول واستشارات تخصصية مخصصة.</p>
+            </div>
+            <div class="therapist-badge-indicator">
+              <span class="live-dot"></span> معالج معتمد ومتاح للدعم
+            </div>
+          </div>
+
+          <!-- Pending Cases List -->
+          <div class="card">
+            <h3><i class="fa-solid fa-inbox"></i> صندوق رسائل الفضفضة وطلبات الاستشارة الواردة</h3>
+            <p class="subtitle-text">يمكنك النقر على أي طالب لكتابة توجيه نفسي متخصص يصل إليه مباشرة في حسابه:</p>
+            
+            <div id="therapistCasesList" class="therapist-cases-grid">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= VIEW 7: THERAPIST TESTS ================= -->
+        <section id="viewTherapistTests" class="content-view">
+          <div class="view-header">
+            <div>
+              <h2><i class="fa-solid fa-clipboard-check text-amber"></i> سجل نتائج الاختبارات النفسية للطلاب</h2>
+              <p>استعراض استجابات الطلاب لاختبار بقع الحبر لرورشاخ ومؤشراتهم النفسية.</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div id="therapistTestResultsList" class="table-responsive">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================= VIEW 8: ADMIN DATABASE MANAGEMENT ================= -->
+        <section id="viewAdminHome" class="content-view">
+          <div class="welcome-hero">
+            <div class="hero-text">
+              <div class="greeting-badge"><i class="fa-regular fa-sun"></i> لوحة إدارة المنصة</div>
+              <h2 class="hero-greet">أهلاً بك!</h2>
+              <p>تابع المستخدمين والإحصائيات، وأضف حسابات الطلاب والمعالجين بأمان من مكان واحد.</p>
+              <div class="hero-actions"><button class="btn btn-primary" onclick="navigateTo('viewAdminDb')"><i class="fa-solid fa-users"></i> إدارة المستخدمين</button><button class="btn btn-outline" onclick="navigateTo('viewAdminStats')"><i class="fa-solid fa-chart-pie"></i> إحصائيات المنصة</button></div>
+            </div>
+            <div class="hero-image-box"><img src="assets/logo.png" alt="شعار فينيكس" class="hero-logo-img"></div>
+          </div>
+          <div class="home-stats">
+            <div class="card home-stat"><span class="hs-num" id="adUsers">0</span><small>إجمالي المستخدمين</small></div>
+            <div class="card home-stat"><span class="hs-num" id="adStudents">0</span><small>طلاب</small></div>
+            <div class="card home-stat"><span class="hs-num" id="adTherapists">0</span><small>معالجون</small></div>
+            <div class="card home-stat"><span class="hs-num" id="adVenting">0</span><small>رسائل فضفضة</small></div>
+          </div>
+        </section>
+        <section id="viewAdminDb" class="content-view">
+          <div class="view-header">
+            <div>
+              <h2><i class="fa-solid fa-database text-amber"></i> قاعدة بيانات المستخدمين المسجلين</h2>
+              <p>إدارة سجلات المستخدمين الكاملة في قاعدة البيانات (الأسماء، الإيميلات، والصلاحيات).</p>
+            </div>
+            <button class="btn btn-primary" onclick="openAddUserModal()">
+              <i class="fa-solid fa-user-plus"></i> إضافة مستخدم جديد يدوياً
+            </button>
+          </div>
+
+          <!-- Database Table Card -->
+          <div class="card">
+            <div class="table-search-bar">
+              <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="adminUserSearchInput" placeholder="بحث بالاسم أو البريد الإلكتروني..." oninput="filterAdminUserTable()">
+              </div>
+              <button class="btn btn-outline" onclick="loadAdminUsers()"><i class="fa-solid fa-rotate"></i> تحديث الجدول</button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="db-table" id="usersDbTable">
+                <thead>
+                  <tr>
+                    <th>المعرف (ID)</th>
+                    <th>الاسم الكامل</th>
+                    <th>البريد الإلكتروني</th>
+                    <th>الدور / الصلاحية</th>
+                    <th>تاريخ التسجيل</th>
+                    <th>إجراءات</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                  <!-- Populated dynamically via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= VIEW 9: ADMIN STATS ================= -->
+        <section id="viewAdminStats" class="content-view">
+          <div class="view-header">
+            <div>
+              <h2><i class="fa-solid fa-chart-pie text-amber"></i> إحصائيات ومؤشرات المنصة العامة</h2>
+              <p>نظرة تحليلية على عدد الطلاب، جلسات الفضفضة، الأهداف المحققة، والتفاعل الإجمالي.</p>
+            </div>
+          </div>
+
+          <div class="stats-overview-grid" id="adminStatsGrid">
+            <!-- Stat cards injected by JS -->
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+
+    <!-- ================= FOOTER (WITH BRAND NAME & COPYRIGHT) ================= -->
+    <footer class="app-footer">
+      <div class="footer-container">
+        <div class="footer-brand-meta">
+          <img src="assets/logo.png" alt="شعار فينيكس" class="footer-logo">
+          <div>
+            <strong>مَنَصَّة فِينِيكْس لِلدَّعْمِ النَّفْسِي الجَامِعِي</strong>
+            <p>حلول متخصصة لتخفيف الضغوط الأكاديمية وتعزيز النهوض والتعافي الذاتي</p>
+          </div>
+        </div>
+
+        <div class="footer-copyright">
+          <p>© 2026 جميع الحقوق محفوظة لمنصة فينيكس للدعم النفسي الجامعي</p>
+          <span>Phoenix University Mental Health & Stress Relief System</span>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- Modal: Add New Goal -->
+  <div id="modalNewGoal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-bullseye"></i> تسجيل هدف أو فكرة جديدة</h3>
+        <button class="modal-close-btn" onclick="closeNewGoalModal()">&times;</button>
+      </div>
+      <form onsubmit="handleCreateGoalSubmit(event)">
+        <div class="form-group">
+          <label>نوع الهدف:</label>
+          <div class="goal-type-radio">
+            <label><input type="radio" name="goalType" value="short" checked> 🎯 قصير المدى (أسبوعي/دراسي)</label>
+            <label><input type="radio" name="goalType" value="long"> 🚀 طويل المدى (تطوير ذات/تخرج)</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>تصنيف الهدف:</label>
+          <select id="goalCategory">
+            <option value="دراسي">دراسي وأكاديمي</option>
+            <option value="صحة نفسية">صحة نفسية وراحة</option>
+            <option value="عادات يومية">عادات وتنظيم وقت</option>
+            <option value="تطوير ذات">تطوير مهارات وشخصية</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>عنوان الهدف / الفكرة:</label>
+          <input type="text" id="goalTitle" placeholder="مثلاً: مراجعة محاضرات الأسبوع الأول، ممارسة رياضة خفيفة" required>
+        </div>
+        <div class="form-group">
+          <label>ملاحظات أو خطوات تفصيلية:</label>
+          <textarea id="goalDescription" rows="3" placeholder="تفاصيل إضافية لتذكيرك بما يجب فعله..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeNewGoalModal()">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ الهدف في المذكرة</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Therapist Reply Modal -->
+  <div id="modalTherapistReply" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-reply"></i> كتابة رد واستشارة تخصصية للطالب</h3>
+        <button class="modal-close-btn" onclick="closeTherapistReplyModal()">&times;</button>
+      </div>
+      <div class="student-case-summary">
+        <p><strong>الطالب:</strong> <span id="replyModalStudentName"></span></p>
+        <p><strong>الموضوع:</strong> <span id="replyModalCategory"></span></p>
+        <div class="quote-box" id="replyModalStudentMsg"></div>
+      </div>
+      <form onsubmit="handleTherapistReplySubmit(event)">
+        <input type="hidden" id="replyTargetMsgId">
+        <div class="form-group">
+          <label>نص التوجيه الإرشادي والحل النفسي المتخصص:</label>
+          <textarea id="therapistReplyContent" rows="5" placeholder="اكتب توجيهاتك المهنية، خطوات التهدئة، والنصائح العملية الموجهة للطالب..." required></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeTherapistReplyModal()">إلغاء</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> إرسال الاستشارة إلى الطالب</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Admin Add User Modal -->
+  <div id="modalAdminAddUser" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-user-plus"></i> إضافة مستخدم جديد لقاعدة البيانات</h3>
+        <button class="modal-close-btn" onclick="closeAddUserModal()">&times;</button>
+      </div>
+      <form onsubmit="handleAdminAddUserSubmit(event)">
+        <div class="form-group">
+          <label>الاسم الكامل:</label>
+          <input type="text" id="adminNewName" required placeholder="مثال: يوسف محمود">
+        </div>
+        <div class="form-group">
+          <label>البريد الإلكتروني:</label>
+          <input type="email" id="adminNewEmail" required placeholder="name@domain.edu">
+        </div>
+        <div class="form-group">
+          <label>كلمة المرور:</label>
+          <input type="text" id="adminNewPassword" required placeholder="password123">
+        </div>
+        <div class="form-group">
+          <label>الدور / الصلاحية:</label>
+          <select id="adminNewRole">
+            <option value="user">طالب / مستخدم (User)</option>
+            <option value="therapist">معالج نفسي (Therapist)</option>
+            <option value="admin">أدمن / مدير النظام (Admin)</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeAddUserModal()">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ في قاعدة البيانات</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Forgot Password -->
+  <div id="modalForgot" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-key"></i> استعادة كلمة المرور</h3>
+        <button class="modal-close-btn" onclick="closeForgotModal()">&times;</button>
+      </div>
+      <form id="forgotStep1" onsubmit="submitForgotEmail(event)">
+        <div class="form-group">
+          <label>البريد الإلكتروني المسجل:</label>
+          <input type="email" id="forgotEmail" required placeholder="name@university.edu">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeForgotModal()">إلغاء</button>
+          <button type="submit" class="btn btn-primary">إرسال رمز الاستعادة</button>
+        </div>
+      </form>
+      <form id="forgotStep2" style="display: none;" onsubmit="submitResetPassword(event)">
+        <div class="form-group">
+          <label>رمز التحقق (6 أرقام):</label>
+          <input type="text" id="forgotCode" inputmode="numeric" maxlength="6" required placeholder="123456">
+        </div>
+        <div class="form-group">
+          <label>كلمة المرور الجديدة:</label>
+          <input type="password" id="forgotNewPwd" minlength="6" required>
+        </div>
+        <div class="form-group">
+          <label>تأكيد كلمة المرور الجديدة:</label>
+          <input type="password" id="forgotNewPwd2" minlength="6" required>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="closeForgotModal()">إلغاء</button>
+          <button type="submit" class="btn btn-primary">تغيير كلمة المرور</button>
+        </div>
+      </form>
+      <div id="forgotAlert" class="alert-box" style="display: none; white-space: pre-line;"></div>
+    </div>
+  </div>
+
+  <!-- App JavaScript -->
+  <script src="js/app.js"></script>
+</body>
+</html>
